@@ -4,87 +4,101 @@ using UnityEngine;
 
 public class Player3D : MonoBehaviour {
 
-	public float speed;
-	public float invincibilityDuration;
-	public float speedUpDuration;
+    //player parameters
+    public float speed = 8f;
+    public float invincibilityDuration = 10f;
+    public float speedUpDuration = 5f;
 
-	private bool usedInvincibility;
-	private bool usedSpeedUp;
+    //powerups settings
+    public float speedUpMultiplier = 2f;
+    public float invincibilityScale = 0.5f;
+    bool usedInvincibility = false;
+    bool usedSpeedUp = false;
 
-	private float invincibilityTimer;
-	private float speedUpTimer;
+    private float invincibilityTimer;
+    private float speedUpTimer;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		float speedMultiplier = speedUpTimer > 0 ? 2f : 1f;
-			
-		if (Input.GetMouseButton (0)) {
-			Vector2 relativeMousePosition = new Vector2 (Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height);
+    // Update is called once per frame
+    void Update () {
 
-			if (relativeMousePosition.x < 0.5f) {
-				GetComponent<Rigidbody> ().velocity = new Vector3 (-speed * speedMultiplier, 0, 0);
-			} else if (relativeMousePosition.x > 0.5f) {
-				GetComponent<Rigidbody> ().velocity = new Vector3 (speed * speedMultiplier, 0, 0);
-			}
-		} else {
-			GetComponent<Rigidbody> ().velocity = Vector3.zero;
-		}
-
-		// Keep the player within bounds.
-		float zDistance = Camera.main.transform.position.z - transform.position.z;
+        float speedMultiplier = speedUpTimer > 0 ? speedUpMultiplier : 1f;
 
 
-		float leftLimit = Camera.main.ScreenToWorldPoint(new Vector3(
-			0,
-			0,
-			-zDistance / (Mathf.Cos(Camera.main.transform.localEulerAngles.x * Mathf.Deg2Rad))
-		)).x;
+        if (Input.GetMouseButton(0))
+        {
+            Vector2 relativePosition = new Vector2(Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height);
 
-		float rightLimit = Camera.main.ScreenToWorldPoint(new Vector3(
-			Screen.width,
-			0,
-			-zDistance / (Mathf.Cos(Camera.main.transform.localEulerAngles.x * Mathf.Deg2Rad))
-		)).x;
+            if (relativePosition.x < 0.5f)
+            {
+                //move left
+                GetComponent<Rigidbody>().velocity = new Vector3(-speed * speedMultiplier, 0, 0);
+            }
+            else if (relativePosition.x > 0.5f)
+            {
+                //move right
+                GetComponent<Rigidbody>().velocity = new Vector3(speed * speedMultiplier, 0, 0);
+            }
+        }
+        else
+        {
+            //stay still
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
 
-		if (transform.position.x < leftLimit) {
-			transform.position = new Vector3 (leftLimit, transform.position.y, transform.position.z);
-		} else if (transform.position.x > rightLimit) {
-			transform.position = new Vector3 (rightLimit, transform.position.y, transform.position.z);
-		}
+        //keep player within bounce
+        float zDistance = Camera.main.transform.position.z - transform.position.z;
 
-		// Use powerups.
-		if (invincibilityTimer > 0f) {
-			invincibilityTimer -= Time.deltaTime;
-			transform.localScale = new Vector3 (1.2f, 1.2f, 1.2f);
-		} else {
-			transform.localScale = Vector3.one;
-		}
+        float leftLimit = Camera.main.ScreenToWorldPoint(new Vector3(
+            0, 
+            0, 
+            -zDistance / (Mathf.Cos(Camera.main.transform.localEulerAngles.x * Mathf.Deg2Rad))
+        )).x;
 
-		if (speedUpTimer > 0f) {
-			speedUpTimer -= Time.deltaTime;
-		}
-	}
+        float rightLimit = Camera.main.ScreenToWorldPoint(new Vector3(
+            Screen.width,
+            0,
+            -zDistance / (Mathf.Cos(Camera.main.transform.localEulerAngles.x * Mathf.Deg2Rad))
+        )).x;
 
-	public void ActivateInvincibility () {
-		if (usedInvincibility)
-			return;
+        if (transform.position.x < leftLimit)
+        {
+            transform.position = new Vector3(leftLimit, transform.position.y, transform.position.z);
+        }
+        else if (transform.position.x > rightLimit)
+        {
+            transform.position = new Vector3(rightLimit, transform.position.y, transform.position.z);
+        }
 
-		usedInvincibility = true;
+        //using powerups
+        if (invincibilityTimer > 0f)
+        {
+            invincibilityTimer -= Time.deltaTime;
+            transform.localScale = new Vector3(invincibilityScale, invincibilityScale, invincibilityScale);
+        }
+        else
+            transform.localScale = Vector3.one;
 
-		invincibilityTimer = invincibilityDuration;
-	}
+        if (speedUpTimer > 0f)
+            speedUpTimer -= Time.deltaTime;
+    }
 
-	public void ActivateSpeedUp () {
-		if (usedSpeedUp)
-			return;
+    public void ActivateInvincibility()
+    {
+        if (usedInvincibility)
+            return;
 
-		usedSpeedUp = true;
+        usedInvincibility = true;
 
-		speedUpTimer = speedUpDuration;
-	}
+        invincibilityTimer = invincibilityDuration;
+    }
+
+    public void ActivateSpeedUp()
+    {
+        if (usedSpeedUp)
+            return;
+
+        usedSpeedUp = true;
+
+        speedUpTimer = speedUpDuration;
+    }
 }

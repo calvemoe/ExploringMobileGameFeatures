@@ -5,7 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class SceneManagerUI : MonoBehaviour {
 
-	public void OnPlay () {
-		SceneManager.LoadScene ("3DSpace");
-	}
+	public void GoPlay()
+    {
+        SceneManager.LoadScene("3DSpace");
+    }
 }
